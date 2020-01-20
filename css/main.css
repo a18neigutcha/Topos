@@ -1,0 +1,7 @@
+#pantalla_juego{
+    background-image: url("../img/background.png");
+    height: 1024px;
+    width: 650px;
+    padding-top: 220px;
+    cursor:wait;
+}
