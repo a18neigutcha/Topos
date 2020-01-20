@@ -3,5 +3,8 @@
     height: 1024px;
     width: 650px;
     padding-top: 220px;
-    cursor:wait;
+    cursor:url("../img/hammer_01.png"),pointer;
+}
+#pantalla_juego:active{
+    cursor:url("../img/hammer_03.png"),progress;
 }
