@@ -6,15 +6,15 @@ window.onload=function(){
         puntos:0
     };
     datos_topos={
-        topos:[{nombre:"topo1",estado:false , nanimacion:0 },
-                {nombre:"topo2",estado:false, nanimacion:0 },
-                {nombre:"topo3",estado:false, nanimacion:0},
-                {nombre:"topo4",estado:false, nanimacion:0},
-                {nombre:"topo5",estado:false, nanimacion:0},
-                {nombre:"topo6",estado:false, nanimacion:0},
-                {nombre:"topo7",estado:false, nanimacion:0},
-                {nombre:"topo8",estado:false, nanimacion:0},
-                {nombre:"topo9",estado:false, nanimacion:0}]
+        topos:[{nombre:"topo1",estado:0 , nanimacion:0 },
+                {nombre:"topo2",estado:0, nanimacion:0 },
+                {nombre:"topo3",estado:0, nanimacion:0},
+                {nombre:"topo4",estado:0, nanimacion:0},
+                {nombre:"topo5",estado:0, nanimacion:0},
+                {nombre:"topo6",estado:0, nanimacion:0},
+                {nombre:"topo7",estado:0, nanimacion:0},
+                {nombre:"topo8",estado:0, nanimacion:0},
+                {nombre:"topo9",estado:0, nanimacion:0}]
     };
 
     var modelo={
@@ -31,25 +31,36 @@ window.onload=function(){
             return datos_juegos.puntos;
         },
         activa_topo:function(numTopo){           
-            datos_topos.topos[numTopo].estado=true;
+            datos_topos.topos[numTopo].estado=1;
         },
         pasoSiguiente:function(){
             for(let i=0;i<datos_topos.topos.length;i++){
                 
-                if(datos_topos.topos[i].estado==true){
+                if(datos_topos.topos[i].estado==1){
                     datos_topos.topos[i].nanimacion++;
                     if (datos_topos.topos[i].nanimacion==8){
                         datos_topos.topos[i].nanimacion=0;
-                        datos_topos.topos[i].estado=false;
+                        datos_topos.topos[i].estado=0;
                     }
 
+                }
+                if(datos_topos.topos[i].estado==-1){
+                    datos_topos.topos[i].nanimacion++;
+                    if (datos_topos.topos[i].nanimacion==4){
+                        datos_topos.topos[i].nanimacion=0;
+                        datos_topos.topos[i].estado=0;
+                    }
                 }
             }
 
         },
         matar_topo:function(pos_topo){
-            datos_topos.topos[pos_topo].estado=false;
-            datos_topos.topos[pos_topo].nanimacion=0;
+            if(datos_topos.topos[pos_topo].estado==1){
+                datos_topos.topos[pos_topo].estado=-1;
+                datos_topos.topos[pos_topo].nanimacion=0;
+                datos_juegos.puntos++;
+            }
+            
         }
 
 
@@ -97,13 +108,14 @@ window.onload=function(){
              * Genera los topos
              */
             for(let i=0;i<topos.length;i++){
-                camp_topo=document.getElementById(i);
-                //console.log(camp_topo);
+                camp_topo=document.getElementsByClassName("img_topo");
                 
-                if ( topos[i].nanimacion==0){                      
-                    camp_topo.innerHTML="<img src=\"img/hole.png\">";
-                } else{
-                    camp_topo.innerHTML="<img src=\"img/topo"+topos[i].nanimacion+".png\">";
+                if ( topos[i].estado==0){                      
+                    camp_topo[i].src="img/hole.png";
+                } else if(topos[i].estado==1){
+                    camp_topo[i].src="img/topo"+topos[i].nanimacion+".png";
+                }else{
+                    camp_topo[i].src="img/golpe"+topos[i].nanimacion+".png";
                 }
             }
 
@@ -113,11 +125,10 @@ window.onload=function(){
             puntos.innerHTML=puntosActuales;
         },
         evento_pegar_topo:function(){
-            let img_topos=document.getElementsByClassName("topo");
+            let camp_topos=document.getElementsByClassName("topo");
 
-            for(let i=0;i<img_topos.length;i++){
-                img_topos[i].addEventListener("click",function(){
-                    console.log("Topo numero: "+i+" muerto");
+            for(let i=0;i<camp_topos.length;i++){
+                camp_topos[i].addEventListener("click",function(){
                     controlador.matar_topo(i);
                 });
             }
