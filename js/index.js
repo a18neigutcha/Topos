@@ -2,13 +2,15 @@
 const TOPO_INACTIVO=0;
 const TOPO_ACTIVO=1;
 const TOPO_GOLPEADO=-1;
-const CONEJO=2;
+const CONEJO_ACTIVO=2;
+const CONEJO_GOLPEADO=-2;
 
 window.onload=function(){
 
     datos_juegos={
         nivel:1,
-        puntos:0
+        puntos:0,
+        partida:[{timeRandom:0,timeSiguiente:0}]
     };
     datos_topos={
         topos:[{nombre:"topo1",estado:TOPO_INACTIVO , nanimacion:0 },
@@ -45,18 +47,27 @@ window.onload=function(){
         },
         pasoSiguiente:function(){
             for(let i=0;i<datos_topos.topos.length;i++){
-                datos_topos.topos[i].nanimacion++;
+                
                 if(datos_topos.topos[i].estado==TOPO_ACTIVO){
+                    datos_topos.topos[i].nanimacion++;
                     if (datos_topos.topos[i].nanimacion==8){
                         modelo.reiniciaAnimacion(i);
                     }
                 }
                 if(datos_topos.topos[i].estado==TOPO_GOLPEADO){
+                    datos_topos.topos[i].nanimacion++;
                     if (datos_topos.topos[i].nanimacion==4){
                         modelo.reiniciaAnimacion(i);
                     }
                 }
-                if(datos_topos.topos[i].estado==CONEJO){
+                if(datos_topos.topos[i].estado==CONEJO_ACTIVO){
+                    datos_topos.topos[i].nanimacion++;
+                    if (datos_topos.topos[i].nanimacion==8){
+                        modelo.reiniciaAnimacion(i);
+                    }
+                }
+                if(datos_topos.topos[i].estado==CONEJO_GOLPEADO){
+                    datos_topos.topos[i].nanimacion++;
                     if (datos_topos.topos[i].nanimacion==4){
                         modelo.reiniciaAnimacion(i);
                     }
@@ -69,8 +80,18 @@ window.onload=function(){
                 datos_topos.topos[pos_topo].estado=TOPO_GOLPEADO;
                 datos_topos.topos[pos_topo].nanimacion=0;
                 datos_juegos.puntos++;
+            }else if(datos_topos.topos[pos_topo].estado==CONEJO_ACTIVO){
+                datos_topos.topos[pos_topo].estado=CONEJO_GOLPEADO;
+                datos_topos.topos[pos_topo].nanimacion=0;
+                datos_juegos.puntos--;
             }
             
+        },
+        iniciaJuego:function(){
+            datos_juegos.puntos=0;
+        },
+        damePartida:function(){
+            return datos_juegos.partida;
         }
 
 
@@ -79,8 +100,9 @@ window.onload=function(){
     var controlador={
         init:function(){
             vista.init();
-            window.setInterval(controlador.pasoSiguiente, 150);
-            window.setInterval(controlador.activa_topo_aleatorio, 1300);
+            controlador.iniciarPartida();
+
+            setTimeout(controlador.terminarPartida, 30000);
             
         },
         pasoSiguiente: function(){
@@ -94,13 +116,26 @@ window.onload=function(){
         },
         activa_topo_aleatorio:function(){
             let topo_random=Math.floor(Math.random() * 9);
-            let estado_random=Math.floor(Math.random() * CONEJO)+TOPO_ACTIVO; 
+            let estado_random=Math.floor(Math.random() * CONEJO_ACTIVO)+TOPO_ACTIVO; 
             modelo.activa_topo(topo_random,estado_random);
         },
         matar_topo:function(pos_topo){
             modelo.matar_topo(pos_topo);
             
         },
+        iniciarPartida:function(){
+            modelo.iniciaJuego();
+            let partida=modelo.damePartida();
+            partida.timeSiguiente = window.setInterval(controlador.pasoSiguiente, 150);
+            partida.timeRandom = window.setInterval(controlador.activa_topo_aleatorio, 1300);
+            window.setInterval(vista.actualizaBarra,1000);
+        },
+        terminarPartida:function(){
+            let partida=modelo.damePartida();
+            clearInterval(partida.timeSiguiente);
+            clearInterval(partida.timeRandom);
+            alert("Partida finalizada");
+        }
 
 
 
@@ -125,8 +160,12 @@ window.onload=function(){
                     camp_topo[i].src="img/hole.png";
                 } else if(topos[i].estado==TOPO_ACTIVO){
                     camp_topo[i].src="img/topo"+topos[i].nanimacion+".png";
-                }else{
+                }else if(topos[i].estado==TOPO_GOLPEADO){
                     camp_topo[i].src="img/golpe"+topos[i].nanimacion+".png";
+                }else if(topos[i].estado==CONEJO_ACTIVO){
+                    camp_topo[i].src="img/conejo"+topos[i].nanimacion+".png";
+                }else{
+                    camp_topo[i].src="img/conejoGolpe"+topos[i].nanimacion+".png";
                 }
             }
 
@@ -143,6 +182,15 @@ window.onload=function(){
                     controlador.matar_topo(i);
                 });
             }
+
+        },
+        actualizaBarra:function(){
+            let elem = document.getElementById("myBar");
+            let width=parseInt(elem.innerText);
+            width++;
+            elem.style.width = width + "%";
+            elem.innerHTML = width;
+            console.log("Time",width);
 
         }
 

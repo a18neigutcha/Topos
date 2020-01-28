@@ -8,3 +8,16 @@
 #pantalla_juego:active{
     cursor:url("../img/hammer_03.png"),progress;
 }
+#myProgress {
+    width: 100%;
+    background-color: #ddd;
+  }
+  
+  #myBar {
+    width: 0%;
+    height: 30px;
+    background-color: blue;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+  }
