@@ -10,7 +10,7 @@ window.onload=function(){
     datos_juegos={
         nivel:1,
         puntos:0,
-        partida:[{timeRandom:0,timeSiguiente:0}]
+        partida:[{timeRandom:0,timeSiguiente:0,timeDuracion:0}]
     };
     datos_topos={
         topos:[{nombre:"topo1",estado:TOPO_INACTIVO , nanimacion:0 },
@@ -88,10 +88,20 @@ window.onload=function(){
             
         },
         iniciaJuego:function(){
+            
             datos_juegos.puntos=0;
+            datos_juegos.timeDuracion=0;
+            datos_juegos.terminarPartida=0;
+            datos_juegos.timeRandom=0;
         },
         damePartida:function(){
             return datos_juegos.partida;
+        },
+        reiniciarPartida:function(){
+            datos_juegos.puntos=0;
+            datos_juegos.timeDuracion=0;
+            datos_juegos.terminarPartida=0;
+            datos_juegos.timeRandom=0;
         }
 
 
@@ -100,9 +110,7 @@ window.onload=function(){
     var controlador={
         init:function(){
             vista.init();
-            controlador.iniciarPartida();
-
-            setTimeout(controlador.terminarPartida, 30000);
+            //controlador.iniciarPartida();
             
         },
         pasoSiguiente: function(){
@@ -125,16 +133,20 @@ window.onload=function(){
         },
         iniciarPartida:function(){
             modelo.iniciaJuego();
+            controlador.terminarPartida();
+            vista.reiniciarBarra();
             let partida=modelo.damePartida();
             partida.timeSiguiente = window.setInterval(controlador.pasoSiguiente, 150);
             partida.timeRandom = window.setInterval(controlador.activa_topo_aleatorio, 1300);
-            window.setInterval(vista.actualizaBarra,1000);
+            partida.timeDuracion = window.setInterval(vista.actualizaBarra,300);
+
+            setTimeout(controlador.terminarPartida, 30001);
         },
         terminarPartida:function(){
             let partida=modelo.damePartida();
             clearInterval(partida.timeSiguiente);
             clearInterval(partida.timeRandom);
-            alert("Partida finalizada");
+            clearInterval(partida.timeDuracion);
         }
 
 
@@ -144,6 +156,7 @@ window.onload=function(){
     var vista={
         init:function(){
             vista.evento_pegar_topo();
+            vista.eventBotInit();
             
         },
         //PINTA LOS TOPOS COMO ESTAN EN LOS DATOS
@@ -192,7 +205,16 @@ window.onload=function(){
             elem.innerHTML = width;
             console.log("Time",width);
 
+        },
+        eventBotInit:function(){
+            document.getElementById("botInit").addEventListener("click",controlador.iniciarPartida);
+        },
+        reiniciarBarra:function(){
+            let elem = document.getElementById("myBar");
+            elem.style.width = 0 + "%";
+            elem.innerHTML=0;
         }
+
 
     }
 
