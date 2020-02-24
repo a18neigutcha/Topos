@@ -140,7 +140,7 @@ window.onload=function(){
             partida.timeRandom = window.setInterval(controlador.activa_topo_aleatorio, 1300);
             partida.timeDuracion = window.setInterval(vista.actualizaBarra,300);
 
-            setTimeout(controlador.terminarPartida, 30001);
+            setTimeout(controlador.terminarPartida, 30100);
         },
         terminarPartida:function(){
             let partida=modelo.damePartida();
